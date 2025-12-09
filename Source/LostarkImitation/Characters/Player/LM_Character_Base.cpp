@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Characters/Player/LM_PC_Base.h"
+#include "Characters/Player/LM_Character_Base.h"
 
 // Sets default values
-ALM_PC_Base::ALM_PC_Base()
+ALM_Character_Base::ALM_Character_Base()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -12,21 +12,21 @@ ALM_PC_Base::ALM_PC_Base()
 }
 
 // Called when the game starts or when spawned
-void ALM_PC_Base::BeginPlay()
+void ALM_Character_Base::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void ALM_PC_Base::Tick(float DeltaTime)
+void ALM_Character_Base::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
 // Called to bind functionality to input
-void ALM_PC_Base::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ALM_Character_Base::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 

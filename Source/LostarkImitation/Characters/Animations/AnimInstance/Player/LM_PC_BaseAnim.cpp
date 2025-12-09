@@ -3,7 +3,7 @@
 
 #include "Characters/Animations/AnimInstance/Player/LM_PC_BaseAnim.h"
 
-#include "Characters/Player/LM_PC_Base.h"
+#include "Characters/Player/LM_Character_Base.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -19,14 +19,14 @@ void ULM_PC_BaseAnim::NativeInitializeAnimation()
 	}
 
 	// Is Valid - OwnerPlayerCharacter
-	OwnerPlayerCharacter = Cast<ALM_PC_Base>(TryGetPawnOwner());
+	OwnerPlayerCharacter = Cast<ALM_Character_Base>(TryGetPawnOwner());
 	if (!OwnerPlayerCharacter)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ULM_PC_BaseAnim::NativeInitializeAnimation() - OwnerPlayerCharacter is null."));
 		return;
 	}
 
-	OwnerPlayerMovementComponent = Cast<UCharacterMovementComponent>(OwnerPlayerCharacter->GetMovementComponent());
+	OwnerPlayerMovementComponent = OwnerPlayerCharacter->GetCharacterMovement();
 }
 
 void ULM_PC_BaseAnim::NativeUpdateAnimation(float DeltaSeconds)

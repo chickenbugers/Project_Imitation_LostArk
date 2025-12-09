@@ -9,7 +9,7 @@
 /**
  * 
  */
-class ALM_PC_Base;
+class ALM_Character_Base;
 class UCharacterMovementComponent;
 
 UCLASS()
@@ -35,7 +35,7 @@ protected:
 	// 점프 키 없을 예정
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character")
-	TObjectPtr<ALM_PC_Base> OwnerPlayerCharacter;
+	TObjectPtr<ALM_Character_Base> OwnerPlayerCharacter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	TObjectPtr<UCharacterMovementComponent> OwnerPlayerMovementComponent;

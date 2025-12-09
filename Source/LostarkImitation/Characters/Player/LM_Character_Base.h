@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "LM_PC_Base.generated.h"
+#include "LM_Character_Base.generated.h"
 
 UCLASS()
-class LOSTARKIMITATION_API ALM_PC_Base : public ACharacter
+class LOSTARKIMITATION_API ALM_Character_Base : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ALM_PC_Base();
+	ALM_Character_Base();
 
 protected:
 	// Called when the game starts or when spawned
