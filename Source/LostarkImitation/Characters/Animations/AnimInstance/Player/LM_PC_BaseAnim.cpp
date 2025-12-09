@@ -26,7 +26,7 @@ void ULM_PC_BaseAnim::NativeInitializeAnimation()
 		return;
 	}
 
-	OwnerPlayerMovementComponent = OwnerPlayerCharacter->GetMovementComponent();
+	OwnerPlayerMovementComponent = Cast<UCharacterMovementComponent>(OwnerPlayerCharacter->GetMovementComponent());
 }
 
 void ULM_PC_BaseAnim::NativeUpdateAnimation(float DeltaSeconds)

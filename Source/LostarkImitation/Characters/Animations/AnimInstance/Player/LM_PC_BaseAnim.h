@@ -10,6 +10,7 @@
  * 
  */
 class ALM_PC_Base;
+class UCharacterMovementComponent;
 
 UCLASS()
 class LOSTARKIMITATION_API ULM_PC_BaseAnim : public UAnimInstance
