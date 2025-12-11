@@ -11,7 +11,7 @@
 
 ALM_PlayerController::ALM_PlayerController()
 {
-
+	bShowMouseCursor = true;
 }
 
 void ALM_PlayerController::BeginPlay()
@@ -21,7 +21,7 @@ void ALM_PlayerController::BeginPlay()
     if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
         ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
     {
-        Subsystem->AddMappingContext(IMC_DefaultTouch, 0);
+        Subsystem->AddMappingContext(IMC_PCInput, 0);
     }
 }
 
@@ -29,102 +29,88 @@ void ALM_PlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
 
-    UEnhancedInputComponent* EIC = CastChecked<UEnhancedInputComponent>(InputComponent);
+    UEnhancedInputComponent* EI = CastChecked<UEnhancedInputComponent>(InputComponent);
 
-    EIC->BindAction(IA_Touch, ETriggerEvent::Triggered, this, &ALM_PlayerController::OnTouchTriggered);
-    EIC->BindAction(IA_TouchHold, ETriggerEvent::Triggered, this, &ALM_PlayerController::OnTouchHold);
-    EIC->BindAction(IA_TouchRelease, ETriggerEvent::Triggered, this, &ALM_PlayerController::OnTouchReleased);
+    EI->BindAction(IA_Click, ETriggerEvent::Started, this, &ALM_PlayerController::OnClickTriggered);
+    EI->BindAction(IA_Click, ETriggerEvent::Completed, this, &ALM_PlayerController::OnClickTriggered);
+
+    EI->BindAction(IA_Hold, ETriggerEvent::Triggered, this, &ALM_PlayerController::OnHoldTriggered);
+    EI->BindAction(IA_Hold, ETriggerEvent::Completed, this, &ALM_PlayerController::OnHoldTriggered);
+
+    EI->BindAction(IA_MousePosition, ETriggerEvent::Triggered, this, &ALM_PlayerController::OnMousePosition);
 }
 
-void ALM_PlayerController::OnTouchTriggered(const FInputActionValue& Value)
+void ALM_PlayerController::PlayerTick(float DeltaTime)
 {
-    FVector2D ScreenPos = Value.Get<FVector2D>();
+    Super::PlayerTick(DeltaTime);
 
-    TouchStartPos = ScreenPos;
-    TouchStartTime = GetWorld()->GetTimeSeconds();
-    bIsHolding = false;
-    HoldDelta = FVector2D::ZeroVector;
-}
-
-void ALM_PlayerController::OnTouchHold(const FInputActionValue& Value)
-{
-    FVector2D ScreenPos = Value.Get<FVector2D>();
-
-    float Elapsed = GetWorld()->GetTimeSeconds() - TouchStartTime;
-
-    // 짧은 탭 → 홀드 전환
-    if (!bIsHolding && Elapsed > ShortTouchThreshold)
+    if (bHolding)
     {
-        bIsHolding = true;
-
-        // 자동 이동 중단
-        if (ALM_Character_Player* PC = Cast<ALM_Character_Player>(GetPawn()))
+        ALM_Character_Player* playercharacter = Cast<ALM_Character_Player>(GetPawn());
+        if (playercharacter)
         {
-            PC->StopAutoMove();
-        }
-    }
-
-    if (bIsHolding)
-    {
-        HoldDelta = (ScreenPos - TouchStartPos).GetSafeNormal();
-
-        if (ALM_Character_Player* PC = Cast<ALM_Character_Player>(GetPawn()))
-        {
-            PC->MoveByDirection(HoldDelta);
+            playercharacter->MoveTowardMouse(CachedMousePos);
         }
     }
 }
 
-void ALM_PlayerController::OnTouchReleased(const FInputActionValue& Value)
+void ALM_PlayerController::OnMousePosition(const FInputActionValue& Value)
 {
-    FVector2D ScreenPos = Value.Get<FVector2D>();
-
-    float Duration = GetWorld()->GetTimeSeconds() - TouchStartTime;
-
-    // -----------------------
-    // 1) 짧은 터치 → 목적지 이동
-    // -----------------------
-    if (!bIsHolding && Duration < ShortTouchThreshold)
-    {
-        FVector HitLoc;
-        if (DeprojectToGround(ScreenPos, HitLoc))
-        {
-            if (auto* PC = Cast<ALM_Character_Player>(GetPawn()))
-            {
-                PC->MoveToLocation(HitLoc);
-            }
-        }
-    }
-
-    // -----------------------
-    // 2) 홀드 이동 중 → 중단
-    // -----------------------
-    if (bIsHolding)
-    {
-        if (auto* PC = Cast<ALM_Character_Player>(GetPawn()))
-        {
-            PC->StopDirectionalMove();
-        }
-    }
-
-    bIsHolding = false;
-    HoldDelta = FVector2D::ZeroVector;
+    CachedMousePos = Value.Get<FVector2D>();
 }
 
-bool ALM_PlayerController::DeprojectToGround(const FVector2D& Screen, FVector& OutHit)
+void ALM_PlayerController::OnClickTriggered(const FInputActionValue& Value)
 {
-    FVector Origin, Direction;
-    if (!DeprojectScreenPositionToWorld(Screen.X, Screen.Y, Origin, Direction))
-        return false;
+    bool bIsPressed = Value.Get<bool>();
 
+    if (bIsPressed)
+    {
+        // 마우스 버튼 누름
+        bPressed = true;
+        PressTime = GetWorld()->GetTimeSeconds();
+    }
+    else
+    {
+        // 마우스 버튼 뗌
+        float HeldTime = GetWorld()->GetTimeSeconds() - PressTime;
+
+        bPressed = false;
+
+        if (HeldTime < ClickThreshold)
+        {
+            // 짧은 클릭 → 이동
+            MoveToClickLocation();
+        }
+
+        // 홀딩 종료
+        if (bHolding)
+        {
+            bHolding = false;
+            ALM_Character_Player* playercharacter = Cast<ALM_Character_Player>(GetPawn());
+            if (playercharacter)
+                playercharacter->StopHoldMove();
+        }
+    }
+}
+
+void ALM_PlayerController::OnHoldTriggered(const FInputActionValue& Value)
+{
+    if (!bPressed)
+        return;
+
+    bHolding = true;
+}
+
+void ALM_PlayerController::MoveToClickLocation()
+{
     FHitResult Hit;
-    FVector End = Origin + Direction * 20000.f;
+    GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
-    if (GetWorld()->LineTraceSingleByChannel(Hit, Origin, End, ECC_Visibility))
+    if (Hit.bBlockingHit)
     {
-        OutHit = Hit.ImpactPoint;
-        return true;
+        if (ALM_Character_Player* playercharacter = Cast<ALM_Character_Player>(GetPawn()))
+        {
+            playercharacter->MoveToLocation(Hit.Location);
+        }
     }
-
-    return false;
 }

@@ -24,34 +24,36 @@ public:
 public:
     virtual void BeginPlay() override;
     virtual void SetupInputComponent() override;
+    virtual void PlayerTick(float DeltaTime) override;
 
 private:
-    // Enhanced Input
+    // Input Mapping Context
     UPROPERTY(EditDefaultsOnly, Category = "Input")
-    UInputMappingContext* IMC_DefaultTouch;
+    UInputMappingContext* IMC_PCInput;
 
     UPROPERTY(EditDefaultsOnly, Category = "Input")
-    UInputAction* IA_Touch;
+    UInputAction* IA_Click;
 
     UPROPERTY(EditDefaultsOnly, Category = "Input")
-    UInputAction* IA_TouchHold;
+    UInputAction* IA_Hold;
 
     UPROPERTY(EditDefaultsOnly, Category = "Input")
-    UInputAction* IA_TouchRelease;
+    UInputAction* IA_MousePosition;
 
 private:
     // 터치 상태
-    float TouchStartTime = 0.f;
-    FVector2D TouchStartPos;
-    bool bIsHolding = false;
-    FVector2D HoldDelta;
+    bool bPressed = false;
+    bool bHolding = false;
+    float PressTime = 0.f;
 
-    float ShortTouchThreshold = 0.15f;
+    float ClickThreshold = 0.15f;
 
     // Handler
-    void OnTouchTriggered(const FInputActionValue& Value);
-    void OnTouchHold(const FInputActionValue& Value);
-    void OnTouchReleased(const FInputActionValue& Value);
+    void OnClickTriggered(const FInputActionValue& Value);
+    void OnHoldTriggered(const FInputActionValue& Value);
+    void OnMousePosition(const FInputActionValue& Value);
 
-    bool DeprojectToGround(const FVector2D& Screen, FVector& OutHit);
+    FVector2D CachedMousePos;
+
+    void MoveToClickLocation();
 };

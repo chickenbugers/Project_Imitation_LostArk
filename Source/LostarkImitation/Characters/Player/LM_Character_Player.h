@@ -47,6 +47,9 @@ public:
 	void MoveByDirection(const FVector2D& Dir);
 	void StopDirectionalMove();
 
+	void MoveTowardMouse(const FVector2D& MousePos);
+	void StopHoldMove();
+
 private:
 	// Auto move
 	FVector TargetLocation;

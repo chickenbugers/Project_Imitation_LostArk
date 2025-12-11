@@ -111,6 +111,30 @@ void ALM_Character_Player::MoveToLocation(const FVector& InTarget)
 	);
 }
 
+void ALM_Character_Player::MoveTowardMouse(const FVector2D& MousePos)
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC)
+		return;
+
+	FVector WorldOrigin, WorldDir;
+	PC->DeprojectScreenPositionToWorld(MousePos.X, MousePos.Y, WorldOrigin, WorldDir);
+
+	float T = -(WorldOrigin.Z - GetActorLocation().Z) / WorldDir.Z;
+	FVector TargetPos = WorldOrigin + WorldDir * T;
+
+	FVector Dir = TargetPos - GetActorLocation();
+	Dir.Z = 0;
+	Dir.Normalize();
+
+	AddMovementInput(Dir, 1.f);
+}
+
+void ALM_Character_Player::StopHoldMove()
+{
+	GetCharacterMovement()->StopMovementImmediately();
+}
+
 void ALM_Character_Player::AutoMoveStep()
 {
 	FVector Pos = GetActorLocation();
