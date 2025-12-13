@@ -70,7 +70,11 @@ void ALM_Character_Player::InitializeComponents()
 	}
 }
 
-
+void ALM_Character_Player::CacheMovementComponent()
+{
+	LMCharacterMovement = GetCharacterMovement();
+}
+	
 void ALM_Character_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -141,7 +145,7 @@ void ALM_Character_Player::AutoMoveStep()
 	FVector Delta = TargetLocation - Pos;
 	Delta.Z = 0;
 
-	if (Delta.Size() < 20.f)
+	if (Delta.Size() < 10.f)
 	{
 		StopAutoMove();
 		return;
@@ -153,7 +157,10 @@ void ALM_Character_Player::AutoMoveStep()
 
 	FHitResult Hit;
 	GetCharacterMovement()->SafeMoveUpdatedComponent(
-		MoveDelta, GetActorRotation(), true, Hit
+		MoveDelta, 
+		GetActorRotation(),
+		true, 
+		Hit
 	);
 }
 

@@ -68,19 +68,15 @@ void ALM_PlayerController::OnClickTriggered(const FInputActionValue& Value)
         // 마우스 버튼 누름
         bPressed = true;
         PressTime = GetWorld()->GetTimeSeconds();
+
+        // 바로 이동 
+        MoveToClickLocation();
     }
     else
     {
         // 마우스 버튼 뗌
         float HeldTime = GetWorld()->GetTimeSeconds() - PressTime;
-
         bPressed = false;
-
-        if (HeldTime < ClickThreshold)
-        {
-            // 짧은 클릭 → 이동
-            MoveToClickLocation();
-        }
 
         // 홀딩 종료
         if (bHolding)

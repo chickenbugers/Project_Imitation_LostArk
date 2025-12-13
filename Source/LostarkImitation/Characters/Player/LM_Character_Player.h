@@ -74,18 +74,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
 
-	/** Attribute component (HP, MP, Stats 등) - 예시 */
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	//TObjectPtr<UAttributeComponent> AttributeComponent;
-
-	/** Skill component (스킬 로직 캡슐화) - 예시 */
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	//TObjectPtr<USkillComponent> SkillComponent;
-
-	/** Equipment component (장비) - 예시 */
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	//TObjectPtr<UEquipmentComponent> EquipmentComponent;
-
 	/** 캐릭터 전용 MovementComponent (캐스팅 없이 사용) */
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	TObjectPtr<UCharacterMovementComponent> LMCharacterMovement;
@@ -95,6 +83,7 @@ protected:
 	//---------------------------------------
 	// Camera settings (편의 변수)
 	//---------------------------------------
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Settings", meta = (ClampMin = "200.0", ClampMax = "3000.0"))
 	float DefaultArmLength = 1200.f;
 
@@ -109,28 +98,6 @@ protected:
 
 
 protected:
-	//---------------------------------------
-	// Input handling functions
-	//---------------------------------------
-
-	/** 이동 (X = forward/backward, Y = right/left) */
-	void Input_MoveForward(float Value);
-	void Input_MoveRight(float Value);
-
-	/** 카메라 회전 (터치 드래그 / 마우스) - 모바일: Yaw 처리 주로 사용 */
-	void Input_LookUp(float Value);
-	void Input_Turn(float Value);
-
-	/** 기본 공격 */
-	void Input_BasicAttack();
-
-	/** 스킬 사용 (슬롯 인덱스 기반 예시) */
-	void Input_UseSkill1();
-	void Input_UseSkill2();
-
-	/** 회피 */
-	void Input_Dodge();
-
 	//---------------------------------------
 	// Helpers
 	//---------------------------------------
