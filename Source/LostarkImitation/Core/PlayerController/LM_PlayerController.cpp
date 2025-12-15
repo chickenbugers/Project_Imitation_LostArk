@@ -54,6 +54,30 @@ void ALM_PlayerController::PlayerTick(float DeltaTime)
     }
 }
 
+void ALM_PlayerController::RequestMoveToLocation(const FVector& Dest)
+{
+    // 리슨 서버에서 Host는 이미 Server
+    if (HasAuthority())
+    {
+        Server_MoveToLocation(Dest);
+    }
+    else
+    {
+        Server_MoveToLocation(Dest);
+    }
+}
+
+void ALM_PlayerController::Server_MoveToLocation_Implementation(const FVector& Dest)
+{
+    APawn* pawn = GetPawn();
+    if (!pawn) return;
+
+    ALM_Character_Player* character = Cast<ALM_Character_Player>(pawn);
+    if (!character) return;
+
+    character->Server_MoveToLocation(Dest);
+}
+
 void ALM_PlayerController::OnMousePosition(const FInputActionValue& Value)
 {
     CachedMousePos = Value.Get<FVector2D>();
@@ -102,11 +126,8 @@ void ALM_PlayerController::MoveToClickLocation()
     FHitResult Hit;
     GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
-    if (Hit.bBlockingHit)
-    {
-        if (ALM_Character_Player* playercharacter = Cast<ALM_Character_Player>(GetPawn()))
-        {
-            playercharacter->MoveToLocation(Hit.Location);
-        }
-    }
+    if (!Hit.bBlockingHit)
+        return;
+
+    RequestMoveToLocation(Hit.Location);
 }

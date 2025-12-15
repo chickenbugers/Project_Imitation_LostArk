@@ -50,6 +50,9 @@ public:
 	void MoveTowardMouse(const FVector2D& MousePos);
 	void StopHoldMove();
 
+	UFUNCTION(Server, Reliable)
+	void Server_MoveToLocation(const FVector& Dest);
+
 protected:
 	/* ================= Components ================= */
 

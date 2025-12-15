@@ -44,6 +44,11 @@ ALM_Character_Player::ALM_Character_Player()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2048.f;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
+
+	GetCharacterMovement()->SetIsReplicated(true);
+	SetReplicatingMovement(true);
+	bReplicates = true;
 
 	LMCharacterMovement = nullptr;
 
@@ -166,6 +171,17 @@ void ALM_Character_Player::StopDirectionalMove()
 void ALM_Character_Player::StopHoldMove()
 {
 	GetCharacterMovement()->StopMovementImmediately();
+}
+
+void ALM_Character_Player::Server_MoveToLocation_Implementation(const FVector& Dest)
+{
+	AController* control = GetController();
+	if (!control) return;
+
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(
+		control,
+		Dest
+	);
 }
 
 /* ================= Helpers ================= */

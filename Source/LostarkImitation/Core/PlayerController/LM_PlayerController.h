@@ -26,6 +26,13 @@ public:
     virtual void SetupInputComponent() override;
     virtual void PlayerTick(float DeltaTime) override;
 
+public:
+    void RequestMoveToLocation(const FVector& Dest);
+
+protected:
+    UFUNCTION(Server, Reliable)
+    void Server_MoveToLocation(const FVector& Dest);
+
 private:
     // Input Mapping Context
     UPROPERTY(EditDefaultsOnly, Category = "Input")
