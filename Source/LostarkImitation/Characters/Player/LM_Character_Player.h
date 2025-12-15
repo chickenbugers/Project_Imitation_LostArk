@@ -11,18 +11,15 @@
  */
 class USpringArmComponent;
 class UCameraComponent;
-//class UAttributeComponent;
-//class USkillComponent;
-//class UEquipmentComponent;
-class UCameraComponent;
 class UInputComponent;
 class UCharacterMovementComponent;
+class AAIController;
 
 UCLASS()
 class LOSTARKIMITATION_API ALM_Character_Player : public ALM_Character_Base
 {
 	GENERATED_BODY()
-	
+
 public:
 	ALM_Character_Player();
 
@@ -36,53 +33,37 @@ protected:
 	/** Setup Player Input (Enhanced Input 사용 시 확장 가능) */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	/** Camera accessors */
-	UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-	USpringArmComponent* GetSpringArm() const { return SpringArm; }
-
 public:
+	/* ================= 이동 인터페이스 ================= */
+
+	/** 클릭 이동 (AI MoveTo 기반) */
 	void MoveToLocation(const FVector& InTarget);
+
+	/** AI 이동 중단 */
 	void StopAutoMove();
 
+	/** 모바일 / WASD 방향 이동 */
 	void MoveByDirection(const FVector2D& Dir);
 	void StopDirectionalMove();
 
+	/** 마우스 방향 홀드 이동 (PC) */
 	void MoveTowardMouse(const FVector2D& MousePos);
 	void StopHoldMove();
 
-private:
-	// Auto move
-	FVector TargetLocation;
-	FTimerHandle AutoMoveHandle;
-	void AutoMoveStep();
-
-	// Hold move
-	FVector HoldDirection;
-	FTimerHandle HoldMoveHandle;
-	void HoldMoveStep();
-
 protected:
-	//---------------------------------------
-	// Components
-	//---------------------------------------
+	/* ================= Components ================= */
 
-	/** Spring arm for camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> SpringArm;
 
-	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
 
-	/** 캐릭터 전용 MovementComponent (캐스팅 없이 사용) */
 	UPROPERTY(Transient, VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	TObjectPtr<UCharacterMovementComponent> LMCharacterMovement;
 
-
 protected:
-	//---------------------------------------
-	// Camera settings (편의 변수)
-	//---------------------------------------
+	/* ================= Camera Settings ================= */
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Settings", meta = (ClampMin = "200.0", ClampMax = "3000.0"))
 	float DefaultArmLength = 1200.f;
@@ -96,23 +77,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Settings", meta = (ClampMin = "0.0"))
 	float CameraLagSpeed = 10.f;
 
-
 protected:
-	//---------------------------------------
-	// Helpers
-	//---------------------------------------
+	/* ================= Helpers ================= */
 
-	/** 초기 컴포넌트 세팅 */
 	void InitializeComponents();
-
-	/** Movement component 안전하게 가져오기 */
 	void CacheMovementComponent();
-
-	/** 모바일 전용 카메라 보정 (optional) */
 	void UpdateCameraForMobile(float DeltaTime);
 
 private:
-	/** 내부 상태 */
-	UPROPERTY()
-	FVector2D PendingMoveInput;
+	/* ================= Hold Move ================= */
+
+	FVector HoldDirection;
+	FTimerHandle HoldMoveHandle;
+
+	void HoldMoveStep();
 };
