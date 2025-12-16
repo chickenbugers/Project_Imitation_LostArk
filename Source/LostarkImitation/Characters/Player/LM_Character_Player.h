@@ -33,6 +33,8 @@ protected:
 	/** Setup Player Input (Enhanced Input 사용 시 확장 가능) */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	/* ================= 이동 인터페이스 ================= */
 
@@ -52,6 +54,15 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_MoveToLocation(const FVector& Dest);
+
+	// === Replicated Rotation ===
+	UPROPERTY(ReplicatedUsing = OnRep_ServerRotation)
+	FRotator ReplicatedRotation;
+
+	FRotator TargetRotation;
+
+	UFUNCTION()
+	void OnRep_ServerRotation();
 
 protected:
 	/* ================= Components ================= */

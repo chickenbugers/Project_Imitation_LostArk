@@ -25,6 +25,7 @@ public:
     virtual void BeginPlay() override;
     virtual void SetupInputComponent() override;
     virtual void PlayerTick(float DeltaTime) override;
+	virtual void OnPossess(APawn* InPawn) override;
 
 public:
     void RequestMoveToLocation(const FVector& Dest);

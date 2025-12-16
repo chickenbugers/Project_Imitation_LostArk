@@ -54,6 +54,11 @@ void ALM_PlayerController::PlayerTick(float DeltaTime)
     }
 }
 
+void ALM_PlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+}
+
 void ALM_PlayerController::RequestMoveToLocation(const FVector& Dest)
 {
     // 리슨 서버에서 Host는 이미 Server
