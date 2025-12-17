@@ -54,16 +54,6 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_MoveToLocation(const FVector& Dest);
-
-	// === Replicated Rotation ===
-	UPROPERTY(ReplicatedUsing = OnRep_ServerRotation)
-	FRotator ReplicatedRotation;
-
-	FRotator TargetRotation;
-
-	UFUNCTION()
-	void OnRep_ServerRotation();
-
 protected:
 	/* ================= Components ================= */
 

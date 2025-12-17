@@ -54,22 +54,10 @@ void ALM_PlayerController::PlayerTick(float DeltaTime)
     }
 }
 
-void ALM_PlayerController::OnPossess(APawn* InPawn)
-{
-	Super::OnPossess(InPawn);
-}
-
 void ALM_PlayerController::RequestMoveToLocation(const FVector& Dest)
 {
     // 리슨 서버에서 Host는 이미 Server
-    if (HasAuthority())
-    {
-        Server_MoveToLocation(Dest);
-    }
-    else
-    {
-        Server_MoveToLocation(Dest);
-    }
+    Server_MoveToLocation(Dest);
 }
 
 void ALM_PlayerController::Server_MoveToLocation_Implementation(const FVector& Dest)
@@ -104,7 +92,6 @@ void ALM_PlayerController::OnClickTriggered(const FInputActionValue& Value)
     else
     {
         // 마우스 버튼 뗌
-        float HeldTime = GetWorld()->GetTimeSeconds() - PressTime;
         bPressed = false;
 
         // 홀딩 종료

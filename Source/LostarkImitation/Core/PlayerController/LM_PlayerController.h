@@ -25,12 +25,12 @@ public:
     virtual void BeginPlay() override;
     virtual void SetupInputComponent() override;
     virtual void PlayerTick(float DeltaTime) override;
-	virtual void OnPossess(APawn* InPawn) override;
 
 public:
     void RequestMoveToLocation(const FVector& Dest);
 
 protected:
+    /* ================= ¼­¹ö ================= */
     UFUNCTION(Server, Reliable)
     void Server_MoveToLocation(const FVector& Dest);
 
@@ -54,14 +54,12 @@ private:
     bool bHolding = false;
     float PressTime = 0.f;
 
-    float ClickThreshold = 0.15f;
+    FVector2D CachedMousePos;
 
     // Handler
     void OnClickTriggered(const FInputActionValue& Value);
     void OnHoldTriggered(const FInputActionValue& Value);
     void OnMousePosition(const FInputActionValue& Value);
-
-    FVector2D CachedMousePos;
 
     void MoveToClickLocation();
 };
