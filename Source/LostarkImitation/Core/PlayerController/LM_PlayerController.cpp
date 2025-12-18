@@ -45,23 +45,6 @@ void ALM_PlayerController::SetupInputComponent()
     }
 }
 
-void ALM_PlayerController::RequestMoveToLocation(const FVector& Dest)
-{
-    // 리슨 서버에서 Host는 이미 Server
-    Server_MoveToLocation(Dest);
-}
-
-void ALM_PlayerController::Server_MoveToLocation_Implementation(const FVector& Dest)
-{
-    APawn* pawn = GetPawn();
-    if (!pawn) return;
-
-    ALM_Character_Player* character = Cast<ALM_Character_Player>(pawn);
-    if (!character) return;
-
-    character->Server_MoveToLocation(Dest);
-}
-
 void ALM_PlayerController::OnInputStarted()
 {
 	StopMovement();

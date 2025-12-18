@@ -17,41 +17,47 @@
 
 ALM_Character_Player::ALM_Character_Player()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	// Set size for player capsule
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
-	/* ===== Camera ===== */
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(GetCapsuleComponent());
-	SpringArm->TargetArmLength = DefaultArmLength;
-	SpringArm->bEnableCameraLag = bEnableCameraLag;
-	SpringArm->CameraLagSpeed = CameraLagSpeed;
-	SpringArm->SetRelativeRotation(FRotator(DefaultArmPitch, 0.f, 0.f));
-	SpringArm->bDoCollisionTest = true;
-	SpringArm->bUsePawnControlRotation = false;
-	SpringArm->bInheritPitch = false;
-	SpringArm->bInheritYaw = false;
-	SpringArm->bInheritRoll = false;
-
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(SpringArm);
-	FollowCamera->bUsePawnControlRotation = false;
-
-	/* ===== Rotation ===== */ 
-	bUseControllerRotationYaw = false;
+	/* ===== Rotation ===== */
+	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
 	/* ===== Movement ===== */
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
-	GetCharacterMovement()->BrakingDecelerationWalking = 2048.f;
+	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
+	GetCharacterMovement()->bConstrainToPlane = true;
+	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
+	/* ===== Camera ===== */
+	// Create the camera boom component
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->SetUsingAbsoluteRotation(true);
+	SpringArm->TargetArmLength = 800.f;
+	SpringArm->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
+	SpringArm->bDoCollisionTest = false;
+
+	// Create the camera component
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
+	FollowCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+	FollowCamera->bUsePawnControlRotation = false;
+
+	/* ===== Tick ===== */
+	// Activate ticking in order to update the cursor every frame.
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	/* ====== Replication ===== */
 	GetCharacterMovement()->SetIsReplicated(true);
 	SetReplicatingMovement(true);
 	bReplicates = true;
 
+	/* ===== Component ===== */
 	LMCharacterMovement = nullptr;
 }
 
@@ -60,154 +66,9 @@ void ALM_Character_Player::BeginPlay()
 	Super::BeginPlay();
 
 	InitializeComponents();
-	CacheMovementComponent();
-}
-
-void ALM_Character_Player::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	UpdateCameraForMobile(DeltaTime);
-}
-
-void ALM_Character_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	check(PlayerInputComponent);
-}
-
-void ALM_Character_Player::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-}
-
-/* ================= Click Move (AI) ================= */
-
-void ALM_Character_Player::MoveToLocation(const FVector& InTarget)
-{
-	AController* PC = GetController();
-	if (!PC)
-		return;
-
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(
-		PC,
-		InTarget
-	);
-}
-
-void ALM_Character_Player::StopAutoMove()
-{
-	if (AController* PC = GetController())
-	{
-		PC->StopMovement();
-	}
-}
-
-/* ================= Hold Move (PC / Mobile) ================= */
-
-void ALM_Character_Player::MoveTowardMouse(const FVector2D& MousePos)
-{
-	StopAutoMove();
-
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (!PC)
-		return;
-
-	FVector WorldOrigin, WorldDir;
-	PC->DeprojectScreenPositionToWorld(MousePos.X, MousePos.Y, WorldOrigin, WorldDir);
-
-	float T = -(WorldOrigin.Z - GetActorLocation().Z) / WorldDir.Z;
-	FVector TargetPos = WorldOrigin + WorldDir * T;
-
-	FVector Dir = TargetPos - GetActorLocation();
-	Dir.Z = 0.f;
-	Dir.Normalize();
-
-	AddMovementInput(Dir, 1.f);
-}
-
-void ALM_Character_Player::MoveByDirection(const FVector2D& Dir)
-{
-	StopAutoMove();
-
-	FRotator CamRot = GetControlRotation();
-	FVector Forward = CamRot.Vector();
-	Forward.Z = 0.f;
-	Forward.Normalize();
-
-	FVector Right = FRotationMatrix(CamRot).GetUnitAxis(EAxis::Y);
-
-	HoldDirection = (Forward * Dir.Y + Right * Dir.X).GetSafeNormal();
-
-	if (!GetWorldTimerManager().IsTimerActive(HoldMoveHandle))
-	{
-		GetWorldTimerManager().SetTimer(
-			HoldMoveHandle,
-			this,
-			&ALM_Character_Player::HoldMoveStep,
-			0.016f, true
-		);
-	}
-}
-
-void ALM_Character_Player::HoldMoveStep()
-{
-	if (HoldDirection.IsNearlyZero())
-		return;
-
-	float Speed = GetCharacterMovement()->MaxWalkSpeed * 0.6f;
-	FVector MoveDelta = HoldDirection * Speed * 0.016f;
-
-	FHitResult Hit;
-	GetCharacterMovement()->SafeMoveUpdatedComponent(
-		MoveDelta,
-		GetActorRotation(),
-		true,
-		Hit
-	);
-}
-
-void ALM_Character_Player::StopDirectionalMove()
-{
-	GetWorldTimerManager().ClearTimer(HoldMoveHandle);
-	HoldDirection = FVector::ZeroVector;
-}
-
-void ALM_Character_Player::StopHoldMove()
-{
-	GetCharacterMovement()->StopMovementImmediately();
-}
-
-void ALM_Character_Player::Server_MoveToLocation_Implementation(const FVector& Dest)
-{
-	AController* control = GetController();
-	if (!control) return;
-
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(
-		control,
-		Dest
-	);
-}
-
-/* ================= Helpers ================= */
-
-void ALM_Character_Player::InitializeComponents()
-{
-	if (SpringArm)
-	{
-		SpringArm->TargetArmLength = DefaultArmLength;
-		SpringArm->SetRelativeRotation(FRotator(DefaultArmPitch, 0.f, 0.f));
-		SpringArm->bEnableCameraLag = bEnableCameraLag;
-		SpringArm->CameraLagSpeed = CameraLagSpeed;
-	}
 }
 
 void ALM_Character_Player::CacheMovementComponent()
 {
 	LMCharacterMovement = GetCharacterMovement();
-}
-
-void ALM_Character_Player::UpdateCameraForMobile(float DeltaTime)
-{
-	// 모바일 전용 카메라 보정 확장 포인트
 }

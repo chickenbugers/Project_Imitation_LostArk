@@ -25,14 +25,6 @@ public:
 public:
     virtual void SetupInputComponent() override;
 
-public:
-    void RequestMoveToLocation(const FVector& Dest);
-
-protected:
-    /* ================= ¼­¹ö ================= */
-    UFUNCTION(Server, Reliable)
-    void Server_MoveToLocation(const FVector& Dest);
-
 protected:
     /** Time Threshold to know if it was a short press */
     UPROPERTY(EditAnywhere, Category = "Input")
