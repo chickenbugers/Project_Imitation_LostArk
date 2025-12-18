@@ -10,6 +10,7 @@
 /**
  * 
  */
+class UNiagaraSystem;
 class UInputMappingContext;
 class UInputAction;
 
@@ -22,9 +23,7 @@ public:
 	ALM_PlayerController();
 
 public:
-    virtual void BeginPlay() override;
     virtual void SetupInputComponent() override;
-    virtual void PlayerTick(float DeltaTime) override;
 
 public:
     void RequestMoveToLocation(const FVector& Dest);
@@ -34,32 +33,33 @@ protected:
     UFUNCTION(Server, Reliable)
     void Server_MoveToLocation(const FVector& Dest);
 
-private:
+protected:
+    /** Time Threshold to know if it was a short press */
+    UPROPERTY(EditAnywhere, Category = "Input")
+    float ShortPressThreshold;
     // Input Mapping Context
     UPROPERTY(EditDefaultsOnly, Category = "Input")
-    UInputMappingContext* IMC_PCInput;
+    TObjectPtr<UInputMappingContext> IMC_PCInput;
 
     UPROPERTY(EditDefaultsOnly, Category = "Input")
-    UInputAction* IA_Click;
+    TObjectPtr<UInputAction> IA_Click;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Input")
-    UInputAction* IA_Hold;
+    /** FX Class that we will spawn when clicking */
+    UPROPERTY(EditAnywhere, Category = "Input")
+    TObjectPtr<UNiagaraSystem> FXCursor;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Input")
-    UInputAction* IA_MousePosition;
-
-private:
     // 터치 상태
-    bool bPressed = false;
-    bool bHolding = false;
     float PressTime = 0.f;
+    /** True if the controlled character should navigate to the mouse cursor. */
+    uint32 bMoveToMouseCursor : 1;
+    /** Set to true if we're using touch input */
+    uint32 bIsTouch : 1;
+	// 위치 저장
+    FVector CachedDestination;
 
-    FVector2D CachedMousePos;
-
+protected:
     // Handler
-    void OnClickTriggered(const FInputActionValue& Value);
-    void OnHoldTriggered(const FInputActionValue& Value);
-    void OnMousePosition(const FInputActionValue& Value);
-
-    void MoveToClickLocation();
+    void OnInputStarted();
+    void OnSetDestinationTriggered();
+    void OnSetDestinationReleased();;
 };
