@@ -8,10 +8,12 @@
 #include "EnhancedInputComponent.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
+
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "AiController.h"
 
 #include "LostarkImitation.h"
-#include <NiagaraFunctionLibrary.h>
-#include <Blueprint/AIBlueprintHelperLibrary.h>
 
 ALM_PlayerController::ALM_PlayerController()
 {
@@ -88,9 +90,27 @@ void ALM_PlayerController::OnSetDestinationReleased()
 	if (PressTime <= ShortPressThreshold)
 	{
 		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
+		Server_MoveToLocation(CachedDestination);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}
 
 	PressTime = 0.f;
+}
+
+void ALM_PlayerController::Server_MoveToLocation_Implementation(const FVector& Dest)
+{
+	if (IsLocalController() && GetWorld()->GetNetMode() == NM_ListenServer)
+	{
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
+	}
+	else
+	{
+		APawn* pawn = GetPawn();
+		if (!pawn) return;
+
+		AAIController* AiController = Cast<AAIController>(pawn->GetController());
+		if (!AiController) return;
+
+		AiController->MoveToLocation(Dest);
+	}
 }

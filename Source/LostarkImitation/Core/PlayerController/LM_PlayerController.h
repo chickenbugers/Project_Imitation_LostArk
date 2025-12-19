@@ -25,6 +25,12 @@ public:
 public:
     virtual void SetupInputComponent() override;
 
+public:
+    /* ===== Server ===== */
+    // Server RPC to move the character to the specified location
+    UFUNCTION(Server, Reliable)
+    void Server_MoveToLocation(const FVector& Dest);
+
 protected:
     /** Time Threshold to know if it was a short press */
     UPROPERTY(EditAnywhere, Category = "Input")

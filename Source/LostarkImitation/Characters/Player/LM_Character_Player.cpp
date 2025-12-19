@@ -59,6 +59,9 @@ ALM_Character_Player::ALM_Character_Player()
 
 	/* ===== Component ===== */
 	LMCharacterMovement = nullptr;
+
+	/* ===== AI Controller ===== */
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void ALM_Character_Player::BeginPlay()
