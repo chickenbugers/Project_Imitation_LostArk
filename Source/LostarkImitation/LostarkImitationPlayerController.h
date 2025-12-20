@@ -22,8 +22,17 @@ class ALostarkImitationPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-protected:
+public:
+	/** Constructor */
+	ALostarkImitationPlayerController();
 
+
+public:
+	/** Saved location of the character movement destination */
+	UPROPERTY(Replicated)
+	FVector CachedDestination;
+
+protected:
 	/** Time Threshold to know if it was a short press */
 	UPROPERTY(EditAnywhere, Category="Input")
 	float ShortPressThreshold;
@@ -50,19 +59,16 @@ protected:
 	/** Set to true if we're using touch input */
 	uint32 bIsTouch : 1;
 
-	/** Saved location of the character movement destination */
-	FVector CachedDestination;
-
 	/** Time that the click input has been pressed */
 	float FollowTime = 0.0f;
 
-public:
 
-	/** Constructor */
-	ALostarkImitationPlayerController();
 
 protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+
+protected:
 	/** Initialize input bindings */
 	virtual void SetupInputComponent() override;
 	

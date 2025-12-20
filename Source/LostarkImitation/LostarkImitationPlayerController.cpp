@@ -3,14 +3,18 @@
 #include "LostarkImitationPlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
-#include "LostarkImitationCharacter.h"
-#include "Engine/World.h"
+
 #include "EnhancedInputComponent.h"
-#include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
+
 #include "Engine/LocalPlayer.h"
+#include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
+
 #include "LostarkImitation.h"
 
 ALostarkImitationPlayerController::ALostarkImitationPlayerController()
@@ -18,11 +22,20 @@ ALostarkImitationPlayerController::ALostarkImitationPlayerController()
 	bIsTouch = false;
 	bMoveToMouseCursor = false;
 
+	bReplicates = true;
+
 	// configure the controller
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
 	CachedDestination = FVector::ZeroVector;
 	FollowTime = 0.f;
+}
+
+void ALostarkImitationPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ALostarkImitationPlayerController, CachedDestination);
 }
 
 void ALostarkImitationPlayerController::SetupInputComponent()
@@ -49,10 +62,10 @@ void ALostarkImitationPlayerController::SetupInputComponent()
 			EnhancedInputComponent->BindAction(SetDestinationClickAction, ETriggerEvent::Canceled, this, &ALostarkImitationPlayerController::OnSetDestinationReleased);
 
 			// Setup touch input events
-			EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Started, this, &ALostarkImitationPlayerController::OnInputStarted);
-			EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &ALostarkImitationPlayerController::OnTouchTriggered);
-			EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &ALostarkImitationPlayerController::OnTouchReleased);
-			EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &ALostarkImitationPlayerController::OnTouchReleased);
+			//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Started, this, &ALostarkImitationPlayerController::OnInputStarted);
+			//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Triggered, this, &ALostarkImitationPlayerController::OnTouchTriggered);
+			//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Completed, this, &ALostarkImitationPlayerController::OnTouchReleased);
+			//EnhancedInputComponent->BindAction(SetDestinationTouchAction, ETriggerEvent::Canceled, this, &ALostarkImitationPlayerController::OnTouchReleased);
 		}
 		else
 		{
