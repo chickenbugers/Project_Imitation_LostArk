@@ -66,6 +66,9 @@ void ALM_Character_Player::BeginPlay()
 	Super::BeginPlay();
 
 	InitializeComponents();
+	CacheMovementComponent();
+
+	LMCharacterMovement->bOrientRotationToMovement = true;
 }
 
 void ALM_Character_Player::CacheMovementComponent()
