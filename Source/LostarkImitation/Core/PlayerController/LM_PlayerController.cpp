@@ -80,7 +80,8 @@ void ALM_PlayerController::OnSetDestinationTriggered()
 	if (ControlledPawn != nullptr)
 	{
 		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
-		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
+		Server_MoveToLocation(ControlledPawn->GetActorLocation() + WorldDirection*100.f);
+		//ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
 	}
 }
 
