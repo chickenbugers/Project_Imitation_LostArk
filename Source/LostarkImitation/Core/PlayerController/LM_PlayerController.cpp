@@ -99,18 +99,11 @@ void ALM_PlayerController::OnSetDestinationReleased()
 
 void ALM_PlayerController::Server_MoveToLocation_Implementation(const FVector& Dest)
 {
-	if (IsLocalController() && GetWorld()->GetNetMode() == NM_ListenServer)
-	{
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
-	}
-	else
-	{
-		APawn* pawn = GetPawn();
-		if (!pawn) return;
+	APawn* pawn = GetPawn();
+	if (!pawn) return;
 
-		AAIController* AiController = Cast<AAIController>(pawn->GetController());
-		if (!AiController) return;
+	ALM_Character_Player* character = Cast<ALM_Character_Player>(pawn);
+	if (!character) return;
 
-		AiController->MoveToLocation(Dest);
-	}
+	character->Server_MoveToLocation(Dest);
 }

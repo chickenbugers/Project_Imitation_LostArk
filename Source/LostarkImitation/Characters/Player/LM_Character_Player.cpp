@@ -72,3 +72,14 @@ void ALM_Character_Player::CacheMovementComponent()
 {
 	LMCharacterMovement = GetCharacterMovement();
 }
+
+void ALM_Character_Player::Server_MoveToLocation_Implementation(const FVector& Dest)
+{
+	AController* control = GetController();
+	if (!control) return;
+
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(
+		control,
+		Dest
+	);
+}

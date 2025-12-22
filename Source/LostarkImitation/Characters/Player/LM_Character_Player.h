@@ -23,6 +23,11 @@ class LOSTARKIMITATION_API ALM_Character_Player : public ALM_Character_Base
 public:
 	ALM_Character_Player();
 
+public:
+	/* ===== Server ===== */
+	UFUNCTION(Server, Reliable)
+	void Server_MoveToLocation(const FVector& Dest);
+
 protected:
 	/** BeginPlay */
 	virtual void BeginPlay() override;
