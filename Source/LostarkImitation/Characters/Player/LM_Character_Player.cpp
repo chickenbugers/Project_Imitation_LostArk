@@ -67,8 +67,6 @@ void ALM_Character_Player::BeginPlay()
 
 	InitializeComponents();
 	CacheMovementComponent();
-
-	LMCharacterMovement->bOrientRotationToMovement = true;
 }
 
 void ALM_Character_Player::CacheMovementComponent()
@@ -78,11 +76,32 @@ void ALM_Character_Player::CacheMovementComponent()
 
 void ALM_Character_Player::Server_MoveToLocation_Implementation(const FVector& Dest)
 {
+	if (!HasAuthority())
+		return;
+
 	AController* control = GetController();
-	if (!control) return;
+	if (!control) 
+		return;
+
+	FVector Dir = Dest - GetActorLocation();
+	Dir.Z = 0.0f;
+
+	if (Dir.IsNearlyZero())
+		return;
+
+	const FRotator Rot = Dir.Rotation();
+
+	// 회전만 멀티캐스트
+	Multicast_SetRotation(FRotator(0.f,Rot.Yaw,0.f));
 
 	UAIBlueprintHelperLibrary::SimpleMoveToLocation(
 		control,
 		Dest
 	);
+}
+
+void ALM_Character_Player::Multicast_SetRotation_Implementation(const FRotator& Rot)
+{
+	// AutonomousProxy 포함, 전부 적용
+	SetActorRotation(Rot);
 }

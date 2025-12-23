@@ -28,6 +28,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_MoveToLocation(const FVector& Dest);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetRotation(const FRotator& Rot);
+
 protected:
 	/** BeginPlay */
 	virtual void BeginPlay() override;
