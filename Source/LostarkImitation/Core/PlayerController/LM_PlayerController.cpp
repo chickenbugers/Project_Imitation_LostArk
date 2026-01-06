@@ -70,8 +70,7 @@ void ALM_PlayerController::OnSetDestinationTriggered()
 
 	// We look for the location in the world where the player has pressed the input
 	FHitResult Hit;
-	bool bHitSuccessful = false;
-	bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
+	bool bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
 	
 	// If we hit a surface, cache the location
 	if (bHitSuccessful)
