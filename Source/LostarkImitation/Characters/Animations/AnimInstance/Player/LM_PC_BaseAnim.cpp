@@ -14,7 +14,7 @@ void ULM_PC_BaseAnim::NativeInitializeAnimation()
 	// Is Valid - TryGetPawnOwner
 	if (!TryGetPawnOwner())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ULM_PC_BaseAnim::NativeInitializeAnimation() - Pawn Owner is null."));
+		//UE_LOG(LogTemp, Warning, TEXT("ULM_PC_BaseAnim::NativeInitializeAnimation() - Pawn Owner is null."));
 		return;
 	}
 
@@ -22,7 +22,7 @@ void ULM_PC_BaseAnim::NativeInitializeAnimation()
 	OwnerPlayerCharacter = Cast<ALM_Character_Base>(TryGetPawnOwner());
 	if (!OwnerPlayerCharacter)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ULM_PC_BaseAnim::NativeInitializeAnimation() - OwnerPlayerCharacter is null."));
+		//UE_LOG(LogTemp, Warning, TEXT("ULM_PC_BaseAnim::NativeInitializeAnimation() - OwnerPlayerCharacter is null."));
 		return;
 	}
 

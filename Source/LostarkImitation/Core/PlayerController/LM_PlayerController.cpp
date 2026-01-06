@@ -6,12 +6,17 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "InputActionValue.h"
 
 #include "Kismet/GameplayStatics.h"
+
+#include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "AiController.h"
+
+#include "Engine/LocalPlayer.h"
+#include "Engine/World.h"
 
 #include "LostarkImitation.h"
 
