@@ -17,7 +17,13 @@
 
 ALM_PlayerController::ALM_PlayerController()
 {
+	bMoveToMouseCursor = false;
+
+	// configure the controller
 	bShowMouseCursor = true;
+	DefaultMouseCursor = EMouseCursor::Default;
+	CachedDestination = FVector::ZeroVector;
+	FollowTime = 0.f;
 }
 
 void ALM_PlayerController::SetupInputComponent()
@@ -55,20 +61,13 @@ void ALM_PlayerController::OnInputStarted()
 void ALM_PlayerController::OnSetDestinationTriggered()
 {
 	// We flag that the input is being pressed
-	PressTime += GetWorld()->GetDeltaSeconds();
+	FollowTime += GetWorld()->GetDeltaSeconds();
 
 	// We look for the location in the world where the player has pressed the input
 	FHitResult Hit;
 	bool bHitSuccessful = false;
-	if (bIsTouch)
-	{
-		bHitSuccessful = GetHitResultUnderFinger(ETouchIndex::Touch1, ECollisionChannel::ECC_Visibility, true, Hit);
-	}
-	else
-	{
-		bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
-	}
-
+	bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, Hit);
+	
 	// If we hit a surface, cache the location
 	if (bHitSuccessful)
 	{
@@ -80,31 +79,29 @@ void ALM_PlayerController::OnSetDestinationTriggered()
 	if (ControlledPawn != nullptr)
 	{
 		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
-		Server_MoveToLocation(ControlledPawn->GetActorLocation() + WorldDirection*100.f);
-		//ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
+		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
+		/*
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(
+			this,
+			ControlledPawn->GetActorLocation() + WorldDirection * 100.0f
+		);
+		*/
 	}
 }
 
 void ALM_PlayerController::OnSetDestinationReleased()
 {
 	// If it was a short press
-	if (PressTime <= ShortPressThreshold)
+	if (FollowTime <= ShortPressThreshold)
 	{
 		// We move there and spawn some particles
-		Server_MoveToLocation(CachedDestination);
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(
+			this,
+			CachedDestination
+		);
+
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}
 
-	PressTime = 0.f;
-}
-
-void ALM_PlayerController::Server_MoveToLocation_Implementation(const FVector& Dest)
-{
-	APawn* pawn = GetPawn();
-	if (!pawn) return;
-
-	ALM_Character_Player* character = Cast<ALM_Character_Player>(pawn);
-	if (!character) return;
-
-	character->Server_MoveToLocation(Dest);
+	FollowTime = 0.f;
 }

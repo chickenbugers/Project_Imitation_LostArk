@@ -22,19 +22,18 @@ class LOSTARKIMITATION_API ALM_PlayerController : public APlayerController
 public:
 	ALM_PlayerController();
 
-public:
+protected:
     virtual void SetupInputComponent() override;
-
-public:
-    /* ===== Server ===== */
-    // Server RPC to move the character to the specified location
-    UFUNCTION(Server, Reliable)
-    void Server_MoveToLocation(const FVector& Dest);
 
 protected:
     /** Time Threshold to know if it was a short press */
     UPROPERTY(EditAnywhere, Category = "Input")
     float ShortPressThreshold;
+
+    /** FX Class that we will spawn when clicking */
+    UPROPERTY(EditAnywhere, Category = "Input")
+    TObjectPtr<UNiagaraSystem> FXCursor;
+
     // Input Mapping Context
     UPROPERTY(EditDefaultsOnly, Category = "Input")
     TObjectPtr<UInputMappingContext> IMC_PCInput;
@@ -42,18 +41,15 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Input")
     TObjectPtr<UInputAction> IA_Click;
 
-    /** FX Class that we will spawn when clicking */
-    UPROPERTY(EditAnywhere, Category = "Input")
-    TObjectPtr<UNiagaraSystem> FXCursor;
 
-    // 터치 상태
-    float PressTime = 0.f;
     /** True if the controlled character should navigate to the mouse cursor. */
     uint32 bMoveToMouseCursor : 1;
-    /** Set to true if we're using touch input */
-    uint32 bIsTouch : 1;
-	// 위치 저장
+
+    /** Saved location of the character movement destination */
     FVector CachedDestination;
+
+    /** Time that the click input has been pressed */
+    float FollowTime = 0.0f;
 
 protected:
     // Handler

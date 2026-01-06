@@ -33,6 +33,9 @@ void ULM_PC_BaseAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
+	if (!OwnerPlayerMovementComponent)
+		return;
+
 	// Velocity Update
 	this->Velocity = OwnerPlayerMovementComponent->Velocity;
 
