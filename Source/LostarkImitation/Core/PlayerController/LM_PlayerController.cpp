@@ -50,6 +50,8 @@ void ALM_PlayerController::SetupInputComponent()
             EI->BindAction(IA_Click, ETriggerEvent::Triggered, this, &ALM_PlayerController::OnSetDestinationTriggered);
             EI->BindAction(IA_Click, ETriggerEvent::Completed, this, &ALM_PlayerController::OnSetDestinationReleased);
             EI->BindAction(IA_Click, ETriggerEvent::Canceled, this, &ALM_PlayerController::OnSetDestinationReleased);
+
+			EI->BindAction(IA_Attack, ETriggerEvent::Started, this, &ALM_PlayerController::OnAttackPressed);
         }
         else
         {
@@ -108,4 +110,14 @@ void ALM_PlayerController::OnSetDestinationReleased()
 	}
 
 	FollowTime = 0.f;
+}
+
+void ALM_PlayerController::OnAttackPressed()
+{
+	ALM_Character_Base* Character = Cast<ALM_Character_Base>(GetPawn());
+
+	if (Character)
+	{
+		Character->RequestAttack();
+	}
 }

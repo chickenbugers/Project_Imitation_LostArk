@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "LM_Character_Base.generated.h"
 
+class ULM_CombatComponent;
+
 UCLASS()
 class LOSTARKIMITATION_API ALM_Character_Base : public ACharacter
 {
@@ -14,6 +16,9 @@ class LOSTARKIMITATION_API ALM_Character_Base : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ALM_Character_Base();
+
+public:
+	void RequestAttack();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,4 +31,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+protected:
+	TObjectPtr<ULM_CombatComponent> CombatComponent;
 };

@@ -2,6 +2,7 @@
 
 
 #include "Characters/Player/LM_Character_Base.h"
+#include "Components/Combat/Attack/LM_CombatComponent.h"
 
 // Sets default values
 ALM_Character_Base::ALM_Character_Base()
@@ -9,6 +10,15 @@ ALM_Character_Base::ALM_Character_Base()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	CombatComponent = CreateDefaultSubobject<ULM_CombatComponent>(TEXT("CombatComponent"));
+}
+
+void ALM_Character_Base::RequestAttack()
+{
+	if (!CombatComponent)
+		return;
+
+	CombatComponent->TryAttack();
 }
 
 // Called when the game starts or when spawned

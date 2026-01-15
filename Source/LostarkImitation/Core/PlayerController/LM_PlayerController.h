@@ -41,6 +41,8 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Input")
     TObjectPtr<UInputAction> IA_Click;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Input")
+    TObjectPtr<UInputAction> IA_Attack;
 
     /** True if the controlled character should navigate to the mouse cursor. */
     uint32 bMoveToMouseCursor : 1;
@@ -56,4 +58,6 @@ protected:
     void OnInputStarted();
     void OnSetDestinationTriggered();
     void OnSetDestinationReleased();;
+
+    void OnAttackPressed();
 };
