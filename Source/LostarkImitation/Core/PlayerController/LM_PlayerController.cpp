@@ -114,10 +114,10 @@ void ALM_PlayerController::OnSetDestinationReleased()
 
 void ALM_PlayerController::OnAttackPressed()
 {
-	ALM_Character_Base* Character = Cast<ALM_Character_Base>(GetPawn());
+	ALM_Character_Base* character_base = Cast<ALM_Character_Base>(GetPawn());
 
-	if (Character)
+	if (character_base)
 	{
-		Character->RequestAttack();
+		character_base->RequestAttack(0);
 	}
 }

@@ -13,12 +13,12 @@ ALM_Character_Base::ALM_Character_Base()
 	CombatComponent = CreateDefaultSubobject<ULM_CombatComponent>(TEXT("CombatComponent"));
 }
 
-void ALM_Character_Base::RequestAttack()
+void ALM_Character_Base::RequestAttack(int32 SkillID)
 {
 	if (!CombatComponent)
 		return;
 
-	CombatComponent->TryAttack();
+	CombatComponent->RequestAttack(0);
 }
 
 // Called when the game starts or when spawned

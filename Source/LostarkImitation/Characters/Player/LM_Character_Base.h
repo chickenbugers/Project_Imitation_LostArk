@@ -18,7 +18,7 @@ public:
 	ALM_Character_Base();
 
 public:
-	void RequestAttack();
+	void RequestAttack(int32 SkillID);
 
 protected:
 	// Called when the game starts or when spawned
