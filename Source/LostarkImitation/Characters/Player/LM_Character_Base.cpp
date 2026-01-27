@@ -10,6 +10,9 @@ ALM_Character_Base::ALM_Character_Base()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	bReplicates = true;
+	SetReplicateMovement(true);
+
 	CombatComponent = CreateDefaultSubobject<ULM_CombatComponent>(TEXT("CombatComponent"));
 }
 

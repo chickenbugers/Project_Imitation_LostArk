@@ -86,12 +86,6 @@ void ALM_PlayerController::OnSetDestinationTriggered()
 	{
 		FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
 		ControlledPawn->AddMovementInput(WorldDirection, 1.0, false);
-		/*
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(
-			this,
-			ControlledPawn->GetActorLocation() + WorldDirection * 100.0f
-		);
-		*/
 	}
 }
 
